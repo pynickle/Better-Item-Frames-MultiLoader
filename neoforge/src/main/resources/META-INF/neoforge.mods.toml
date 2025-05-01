@@ -1,0 +1,31 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "better_item_frames"
+version = "${version}"
+displayName = "Better Item Frames"
+authors = "ENC_Euphony"
+description = '''
+Make better invisible item frames in survival
+'''
+#logoFile = ""
+
+[[dependencies.better_item_frames]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.better_item_frames]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "better_item_frames.mixins.json"
