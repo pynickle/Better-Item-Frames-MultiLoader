@@ -6,8 +6,9 @@
   "client": [
   ],
   "mixins": [
+    "AbstractThrownPotionMixin",
     "ItemFrameMixin",
-    "ThrownPotionMixin"
+    "ThrownSplashPotionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
