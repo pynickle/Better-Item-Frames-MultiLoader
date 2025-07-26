@@ -1,6 +1,7 @@
 package com.euphony.better_item_frames.mixin;
 
 import com.euphony.better_item_frames.api.ICustomItemFrame;
+import com.euphony.better_item_frames.config.BIFConfig;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -32,7 +33,7 @@ public class ThrownPotionMixin {
 
     @Unique
     private static void better_item_frames$handleSplash(Iterable<MobEffectInstance> effectInstanceList, ThrownPotion thrownPotion) {
-        AABB checkBox = thrownPotion.getBoundingBox().inflate(1.5D, 1.0D, 1.5D);
+        AABB checkBox = better_item_frames$getBoundingBox(thrownPotion);
         effectInstanceList.forEach(instance -> {
             if (instance.getEffect() == MobEffects.INVISIBILITY) {
                 List<ItemFrame> itemFrames = thrownPotion.level().getEntitiesOfClass(ItemFrame.class, checkBox);
@@ -47,12 +48,21 @@ public class ThrownPotionMixin {
 
     @Unique
     private static void better_item_frames$handleWater(ThrownPotion thrownPotion) {
-        AABB checkBox = thrownPotion.getBoundingBox().inflate(1.5D, 1.0D, 1.5D);
+        AABB checkBox = better_item_frames$getBoundingBox(thrownPotion);
         List<ItemFrame> itemFrames = thrownPotion.level().getEntitiesOfClass(ItemFrame.class, checkBox);
         for (ItemFrame frame : itemFrames) {
             ICustomItemFrame itemFrame = (ICustomItemFrame) frame;
             if (itemFrame.better_item_frames$getIsInvisible())
                 itemFrame.better_item_frames$setIsInvisible(false);
+        }
+    }
+
+    @Unique
+    private static AABB better_item_frames$getBoundingBox(ThrownPotion thrownPotion) {
+        if(BIFConfig.getInstance().getSplashPotionRange() == BIFConfig.SplashPotionRange.HALF) {
+            return thrownPotion.getBoundingBox().inflate(2.0D, 1.0D, 2.0D);
+        } else {
+            return thrownPotion.getBoundingBox().inflate(4.0D, 2.0D, 4.0D);
         }
     }
 }
