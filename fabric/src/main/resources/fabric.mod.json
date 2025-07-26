@@ -25,8 +25,8 @@
     "better_item_frames.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.14",
-    "minecraft": "~1.21.6",
+    "fabricloader": ">=0.16.13",
+    "minecraft": "~1.21.5",
     "java": ">=21"
   },
   "suggests": {
