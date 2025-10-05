@@ -49,7 +49,7 @@ public abstract class ItemFrameMixin extends HangingEntity implements ICustomIte
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readAdditionalSaveDataInject(ValueInput valueInput, CallbackInfo ci) {
-        this.better_item_frames$isInvisible =valueInput.getBooleanOr("isInvisible", false);
+        this.better_item_frames$isInvisible = valueInput.getBooleanOr("isInvisible", false);
     }
 
     @Override

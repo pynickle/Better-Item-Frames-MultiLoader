@@ -49,6 +49,7 @@ public class BIFConfig {
     public static BIFConfig getInstance() {
         if (instance == null) {
             instance = new BIFConfig();
+            instance.load();
         }
         return instance;
     }

@@ -6,6 +6,6 @@ public final class BetterItemFrames {
     public static final String MOD_ID = "better_item_frames";
 
     public static void init() {
-        BIFConfig.getInstance().load();
+        // BIFConfig.getInstance().load();
     }
 }
