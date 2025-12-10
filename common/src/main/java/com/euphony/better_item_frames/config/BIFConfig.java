@@ -8,8 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Better Item Frames模组配置管理器
- * 使用Minecraft自带的night-config库处理TOML格式配置文件
+ * Better Item Frames 模组配置管理器
+ * 使用 Minecraft 自带的 night-config 库处理 TOML 格式配置文件
  */
 public class BIFConfig {
     private static BIFConfig instance;

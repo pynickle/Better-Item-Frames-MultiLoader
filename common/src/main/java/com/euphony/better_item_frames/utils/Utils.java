@@ -5,7 +5,7 @@ import com.euphony.better_item_frames.config.BIFConfig;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.decoration.ItemFrame;
-import net.minecraft.world.entity.projectile.AbstractThrownPotion;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
