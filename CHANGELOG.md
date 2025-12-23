@@ -1,3 +1,9 @@
+## [3.0.1](https://github.com/pynickle/Better-Item-Frames-MultiLoader/compare/v3.0.0...v3.0.1) (2025-12-23)
+
+### 🐛 Bug Fixes
+
+* trigger ([c769e9a](https://github.com/pynickle/Better-Item-Frames-MultiLoader/commit/c769e9a86af2de8436acfc77cf4b850a8914c708))
+
 ## [3.0.0](https://github.com/pynickle/Better-Item-Frames-MultiLoader/compare/v2.0.0...v3.0.0) (2025-12-23)
 
 ### ⚠ BREAKING CHANGES
