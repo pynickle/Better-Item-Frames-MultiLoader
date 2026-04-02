@@ -16,14 +16,14 @@ Make better invisible item frames in survival
 [[dependencies.better_item_frames]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21,)"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.better_item_frames]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.5,)"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"
 

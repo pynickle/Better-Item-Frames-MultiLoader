@@ -47,9 +47,9 @@
     [
       "semantic-release-minecraft",
       {
-        "game_versions": ["1.21.11"],
+        "game_versions": ["26.1", "26.1.1"],
         "mod_loaders": "${ loader }",
-        "display_name": "[${ name } 1.21.11] ${ nextRelease.version }",
+        "display_name": "[${ name } 26.1] ${ nextRelease.version }",
         "glob": "${ loader }/build/libs/BetterItemFrames-${ loader }-${ nextRelease.version }.jar",
         "strategies": [
           {
@@ -63,7 +63,7 @@
         ],
         "curseforge": {
           "project_id": "1230558",
-          "java_versions": 21,
+          "java_versions": 25,
           "environments": ["client", "server"]
         },
         "modrinth": {
