@@ -1,3 +1,13 @@
+## [4.0.0](https://github.com/pynickle/Better-Item-Frames-MultiLoader/compare/v3.0.1...v4.0.0) (2026-04-02)
+
+### ⚠ BREAKING CHANGES
+
+* port to 26.1
+
+### ✨ Features
+
+* port to 26.1 ([baeea84](https://github.com/pynickle/Better-Item-Frames-MultiLoader/commit/baeea848570d4a7cda1e62032951bb34380b897a))
+
 ## [3.0.1](https://github.com/pynickle/Better-Item-Frames-MultiLoader/compare/v3.0.0...v3.0.1) (2025-12-23)
 
 ### 🐛 Bug Fixes
