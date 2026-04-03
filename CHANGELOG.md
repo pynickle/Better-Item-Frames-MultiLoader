@@ -1,3 +1,9 @@
+## [4.0.1](https://github.com/pynickle/Better-Item-Frames-MultiLoader/compare/v4.0.0...v4.0.1) (2026-04-03)
+
+### 🐛 Bug Fixes
+
+* fix crash ([acaa16e](https://github.com/pynickle/Better-Item-Frames-MultiLoader/commit/acaa16e3b26a930829fa13d953a649467121d790))
+
 ## [4.0.0](https://github.com/pynickle/Better-Item-Frames-MultiLoader/compare/v3.0.1...v4.0.0) (2026-04-02)
 
 ### ⚠ BREAKING CHANGES
