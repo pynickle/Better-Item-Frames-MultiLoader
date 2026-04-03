@@ -1,21 +1,24 @@
 package com.euphony.better_item_frames.config;
 
-import com.electronwill.nightconfig.core.file.FileConfig;
 import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * Better Item Frames 模组配置管理器
- * 使用 Minecraft 自带的 night-config 库处理 TOML 格式配置文件
- */
 public class BIFConfig {
     private static BIFConfig instance;
     private static final String CONFIG_FILE_NAME = "better_item_frames-config.toml";
+    private static final String SPLASH_POTION_RANGE_KEY = "splash_potion_range";
+    private static final Pattern SPLASH_POTION_RANGE_PATTERN = Pattern.compile("^\\s*" + SPLASH_POTION_RANGE_KEY + "\\s*=\\s*\"([^\"]*)\"\\s*(?:#.*)?$");
+    private static final Pattern SECTION_PATTERN = Pattern.compile("^\\s*\\[([^\\]]+)]\\s*(?:#.*)?$");
 
-    private FileConfig config;
+    private Path configPath;
+    private SplashPotionRange splashPotionRange = SplashPotionRange.VANILLA;
 
     // 配置选项枚举
     public enum SplashPotionRange {
@@ -72,20 +75,21 @@ public class BIFConfig {
      * 加载配置文件
      */
     public void load() {
-        Path configPath = getConfigFile();
+        configPath = getConfigFile();
 
         // 创建默认配置文件（如果不存在）
         if (!Files.exists(configPath)) {
             createDefaultConfig(configPath);
+            splashPotionRange = SplashPotionRange.VANILLA;
+            return;
         }
 
-        // 使用night-config加载配置文件
-        config = FileConfig.builder(configPath).build();
-        config.load();
-
-        // 确保所有必需的配置项都存在
+        LoadedConfigState loadedConfigState = readConfigState(configPath);
+        splashPotionRange = loadedConfigState.splashPotionRange();
         ensureDefaults();
-        config.save();
+        if (loadedConfigState.requiresNormalization()) {
+            save();
+        }
     }
 
     /**
@@ -118,9 +122,8 @@ public class BIFConfig {
      * 确保默认配置值存在
      */
     private void ensureDefaults() {
-        // 检查并设置默认的喷溅药水范围
-        if (!config.contains("gameplay.splash_potion_range")) {
-            config.set("gameplay.splash_potion_range", SplashPotionRange.VANILLA.getValue());
+        if (splashPotionRange == null) {
+            splashPotionRange = SplashPotionRange.VANILLA;
         }
     }
 
@@ -128,33 +131,41 @@ public class BIFConfig {
      * 获取喷溅药水范围
      */
     public SplashPotionRange getSplashPotionRange() {
-        String value = config.get("gameplay.splash_potion_range");
-        return SplashPotionRange.fromString(value != null ? value : SplashPotionRange.VANILLA.getValue());
+        return splashPotionRange;
     }
 
     /**
      * 设置喷溅药水范围
      */
     public void setSplashPotionRange(SplashPotionRange range) {
-        config.set("gameplay.splash_potion_range", range.getValue());
-        config.save();
+        splashPotionRange = range != null ? range : SplashPotionRange.VANILLA;
+        save();
     }
 
     /**
      * 重新加载配置文件
      */
     public void reload() {
-        if (config != null) {
-            config.load();
-        }
+        load();
     }
 
     /**
      * 手动保存配置文件
      */
     public void save() {
-        if (config != null) {
-            config.save();
+        if (configPath == null) {
+            configPath = getConfigFile();
+        }
+
+        try {
+            if (!Files.exists(configPath)) {
+                createDefaultConfig(configPath);
+            }
+
+            List<String> existingLines = Files.readAllLines(configPath);
+            Files.writeString(configPath, buildConfigContent(existingLines));
+        } catch (IOException e) {
+            System.err.println("Failed to save BetterItemFrames config: " + e.getMessage());
         }
     }
 
@@ -162,8 +173,120 @@ public class BIFConfig {
      * 关闭配置文件
      */
     public void close() {
-        if (config != null) {
-            config.close();
+    }
+
+    private LoadedConfigState readConfigState(Path path) {
+        try {
+            List<String> lines = Files.readAllLines(path);
+            boolean inGameplaySection = false;
+            boolean hasGameplaySection = false;
+            boolean hasSplashPotionRange = false;
+
+            for (String line : lines) {
+                String trimmedLine = line.trim();
+                if (trimmedLine.isEmpty() || trimmedLine.startsWith("#")) {
+                    continue;
+                }
+
+                Matcher sectionMatcher = SECTION_PATTERN.matcher(trimmedLine);
+                if (sectionMatcher.matches()) {
+                    inGameplaySection = "gameplay".equals(sectionMatcher.group(1).trim());
+                    hasGameplaySection = hasGameplaySection || inGameplaySection;
+                    continue;
+                }
+
+                if (!inGameplaySection) {
+                    continue;
+                }
+
+                Matcher matcher = SPLASH_POTION_RANGE_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    hasSplashPotionRange = true;
+                    SplashPotionRange parsedRange = SplashPotionRange.fromString(matcher.group(1));
+                    boolean hasValidSplashPotionRange = parsedRange.getValue().equals(matcher.group(1));
+                    return new LoadedConfigState(parsedRange, !hasGameplaySection || !hasValidSplashPotionRange);
+                }
+            }
+
+            return new LoadedConfigState(SplashPotionRange.VANILLA, !hasGameplaySection || !hasSplashPotionRange);
+        } catch (IOException e) {
+            System.err.println("Failed to load BetterItemFrames config: " + e.getMessage());
         }
+
+        return new LoadedConfigState(SplashPotionRange.VANILLA, false);
+    }
+
+    private String buildConfigContent(List<String> existingLines) {
+        if (existingLines.isEmpty()) {
+            return """
+                    # Better Item Frames Mod Configuration File
+                    # This file uses TOML format and supports comments
+                    
+                    [gameplay]
+                    # Splash potion range configuration
+                    # Controls the range of splash potions when thrown
+                    # Available options:
+                    #   \"vanilla\" - Vanilla range: Use the original Minecraft splash potion range
+                    #   \"half\"    - Half range: Reduce the splash potion range to half of vanilla
+                    # Default value: \"vanilla\"
+                    splash_potion_range = "%s"
+                    """.formatted(splashPotionRange.getValue());
+        }
+
+        List<String> updatedLines = new ArrayList<>();
+        boolean inGameplaySection = false;
+        boolean hasGameplaySection = false;
+        boolean hasSplashPotionRange = false;
+
+        for (String line : existingLines) {
+            String trimmedLine = line.trim();
+            Matcher sectionMatcher = SECTION_PATTERN.matcher(trimmedLine);
+            boolean isSectionHeader = sectionMatcher.matches();
+
+            if (isSectionHeader) {
+                if (inGameplaySection && !hasSplashPotionRange) {
+                    updatedLines.add(buildSplashPotionRangeLine());
+                    hasSplashPotionRange = true;
+                }
+
+                inGameplaySection = "gameplay".equals(sectionMatcher.group(1).trim());
+                hasGameplaySection = hasGameplaySection || inGameplaySection;
+                updatedLines.add(line);
+                continue;
+            }
+
+            if (inGameplaySection) {
+                Matcher matcher = SPLASH_POTION_RANGE_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    updatedLines.add(buildSplashPotionRangeLine());
+                    hasSplashPotionRange = true;
+                    continue;
+                }
+            }
+
+            updatedLines.add(line);
+        }
+
+        if (inGameplaySection && !hasSplashPotionRange) {
+            updatedLines.add(buildSplashPotionRangeLine());
+            hasSplashPotionRange = true;
+        }
+
+        if (!hasGameplaySection) {
+            if (!updatedLines.isEmpty() && !updatedLines.get(updatedLines.size() - 1).isBlank()) {
+                updatedLines.add("");
+            }
+            updatedLines.add("[gameplay]");
+            updatedLines.add(buildSplashPotionRangeLine());
+        }
+
+        return String.join(System.lineSeparator(), updatedLines) + System.lineSeparator();
+    }
+
+    private String buildSplashPotionRangeLine() {
+        return SPLASH_POTION_RANGE_KEY + " = \"" + splashPotionRange.getValue() + "\"";
+    }
+
+    private record LoadedConfigState(SplashPotionRange splashPotionRange, boolean requiresNormalization) {
     }
 }

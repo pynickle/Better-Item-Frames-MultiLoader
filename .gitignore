@@ -119,3 +119,7 @@ runs/
 !gradle-wrapper.jar
 
 node_modules/
+
+.project
+
+/.settings/
